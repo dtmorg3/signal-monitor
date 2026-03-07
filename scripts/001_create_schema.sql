@@ -25,38 +25,14 @@ CREATE TABLE IF NOT EXISTS public.scans (
   error_message TEXT
 );
 
--- Signal types enum
-CREATE TYPE signal_type AS ENUM (
-  'hiring',
-  'funding',
-  'product_launch',
-  'tech_adoption',
-  'expansion',
-  'partnership',
-  'leadership_change',
-  'press_mention',
-  'open_source_activity',
-  'community_engagement'
-);
-
--- Signal sources enum
-CREATE TYPE signal_source AS ENUM (
-  'hacker_news',
-  'web_search',
-  'greenhouse',
-  'lever',
-  'crunchbase',
-  'github'
-);
-
 -- Signals table - detected signals per account per scan
 CREATE TABLE IF NOT EXISTS public.signals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   account_id UUID NOT NULL REFERENCES public.accounts(id) ON DELETE CASCADE,
   scan_id UUID NOT NULL REFERENCES public.scans(id) ON DELETE CASCADE,
-  source signal_source NOT NULL,
-  type signal_type NOT NULL,
+  source TEXT NOT NULL CHECK (source IN ('hacker_news', 'web_search', 'greenhouse', 'lever', 'crunchbase', 'github')),
+  type TEXT NOT NULL CHECK (type IN ('hiring', 'funding', 'product_launch', 'tech_adoption', 'expansion', 'partnership', 'leadership_change', 'press_mention', 'open_source_activity', 'community_engagement')),
   title TEXT NOT NULL,
   snippet TEXT,
   url TEXT,
@@ -69,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public.signals (
 -- Cached results table - store API responses to avoid re-fetching
 CREATE TABLE IF NOT EXISTS public.cached_results (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  source signal_source NOT NULL,
+  source TEXT NOT NULL,
   query_key TEXT NOT NULL,
   response_data JSONB NOT NULL,
   cached_at TIMESTAMPTZ DEFAULT NOW(),
@@ -113,7 +89,7 @@ CREATE POLICY "signals_insert_own" ON public.signals FOR INSERT WITH CHECK (auth
 CREATE POLICY "signals_update_own" ON public.signals FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "signals_delete_own" ON public.signals FOR DELETE USING (auth.uid() = user_id);
 
--- RLS Policies for cached_results (readable by all authenticated users, writable by service role)
+-- RLS Policies for cached_results (readable by all authenticated users)
 CREATE POLICY "cached_results_select_authenticated" ON public.cached_results FOR SELECT TO authenticated USING (true);
 
 -- Updated at trigger function
