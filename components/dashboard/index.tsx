@@ -5,7 +5,7 @@ import useSWR from 'swr'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import type { Account, Signal, Scan, AccountWithSignals } from '@/lib/types'
-import { Header } from './header'
+import { DashboardHeader } from './header'
 import { AccountCard } from './account-card'
 import { AddAccountDialog } from './add-account-dialog'
 import { AccountDetailSheet } from './account-detail-sheet'
@@ -202,7 +202,7 @@ export function Dashboard({ userId, userEmail }: DashboardProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header 
+      <DashboardHeader 
         onAddAccount={() => setAddDialogOpen(true)}
         onScanAll={handleScanAll}
         isScanning={scanningAccounts.size > 0 && !isScanningSingle}

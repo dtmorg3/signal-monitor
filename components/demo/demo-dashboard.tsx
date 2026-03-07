@@ -1,52 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import type { Account, Signal } from '@/lib/types'
+import Link from 'next/link'
+import type { AccountWithSignals, Signal } from '@/lib/types'
 import { DashboardHeader } from '../dashboard/header'
 import { AccountCard } from '../dashboard/account-card'
 import { SignalCard } from '../dashboard/signal-card'
 import { StatsOverview } from '../dashboard/stats-overview'
 import { AccountDetailSheet } from '../dashboard/account-detail-sheet'
 import { AddAccountDialog } from '../dashboard/add-account-dialog'
+import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { Sparkles } from 'lucide-react'
 
 // Mock data for demo mode
-const MOCK_ACCOUNTS: Account[] = [
-  {
-    id: '1',
-    user_id: 'demo',
-    name: 'Acme Corp',
-    domain: 'acme.com',
-    industry: 'Technology',
-    employee_count: '500-1000',
-    notes: 'Enterprise prospect - Q2 pipeline',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    user_id: 'demo',
-    name: 'TechStart Inc',
-    domain: 'techstart.io',
-    industry: 'SaaS',
-    employee_count: '50-200',
-    notes: 'Series B company, fast growing',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    user_id: 'demo',
-    name: 'DataFlow Systems',
-    domain: 'dataflow.dev',
-    industry: 'Data & Analytics',
-    employee_count: '200-500',
-    notes: 'Expanding to EU market',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-]
-
 const MOCK_SIGNALS: Signal[] = [
   {
     id: '1',
@@ -134,24 +101,75 @@ const MOCK_SIGNALS: Signal[] = [
   },
 ]
 
-// Add signals to accounts
-const accountsWithSignals = MOCK_ACCOUNTS.map(account => ({
-  ...account,
-  signals: MOCK_SIGNALS.filter(s => s.account_id === account.id),
-  last_scan: {
-    id: `scan-${account.id}`,
-    user_id: 'demo',
-    account_id: account.id,
-    status: 'completed' as const,
-    started_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    completed_at: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-  },
-}))
+function createMockAccounts(): AccountWithSignals[] {
+  const baseAccounts = [
+    {
+      id: '1',
+      user_id: 'demo',
+      name: 'Acme Corp',
+      domain: 'acme.com',
+      industry: 'Technology',
+      employee_count: '500-1000',
+      notes: 'Enterprise prospect - Q2 pipeline',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      user_id: 'demo',
+      name: 'TechStart Inc',
+      domain: 'techstart.io',
+      industry: 'SaaS',
+      employee_count: '50-200',
+      notes: 'Series B company, fast growing',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: '3',
+      user_id: 'demo',
+      name: 'DataFlow Systems',
+      domain: 'dataflow.dev',
+      industry: 'Data & Analytics',
+      employee_count: '200-500',
+      notes: 'Expanding to EU market',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  ]
+
+  return baseAccounts.map(account => {
+    const accountSignals = MOCK_SIGNALS.filter(s => s.account_id === account.id)
+    return {
+      ...account,
+      signals: accountSignals,
+      latestScan: {
+        id: `scan-${account.id}`,
+        user_id: 'demo',
+        account_id: account.id,
+        status: 'completed' as const,
+        started_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+        completed_at: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+      },
+      signalCount: accountSignals.length,
+      topScore: accountSignals.length > 0 
+        ? Math.max(...accountSignals.map(s => s.score)) 
+        : 0
+    }
+  })
+}
 
 export function DemoDashboard() {
-  const [accounts, setAccounts] = useState(accountsWithSignals)
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
+  const [accounts, setAccounts] = useState<AccountWithSignals[]>(createMockAccounts)
+  const [selectedAccount, setSelectedAccount] = useState<AccountWithSignals | null>(null)
+  const [detailSheetOpen, setDetailSheetOpen] = useState(false)
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [scanningAccounts, setScanningAccounts] = useState<Set<string>>(new Set())
+
+  const handleSelectAccount = (account: AccountWithSignals) => {
+    setSelectedAccount(account)
+    setDetailSheetOpen(true)
+  }
 
   const handleScanAccount = async (accountId: string) => {
     setScanningAccounts(prev => new Set(prev).add(accountId))
@@ -169,25 +187,49 @@ export function DemoDashboard() {
     toast.success('Scan complete', { description: 'Found 2 new signals (demo)' })
   }
 
+  const handleScanAll = async () => {
+    const accountIds = accounts.map(a => a.id)
+    setScanningAccounts(new Set(accountIds))
+    toast.info('Scanning all accounts...', { description: 'Demo mode: simulating scan' })
+    
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    
+    setScanningAccounts(new Set())
+    toast.success('All scans complete', { description: 'Found 6 new signals (demo)' })
+  }
+
   const handleDeleteAccount = (accountId: string) => {
     setAccounts(prev => prev.filter(a => a.id !== accountId))
+    if (selectedAccount?.id === accountId) {
+      setDetailSheetOpen(false)
+      setSelectedAccount(null)
+    }
     toast.success('Account removed')
   }
 
-  const handleAddAccount = (data: { name: string; domain: string; industry?: string; employee_count?: string; notes?: string }) => {
-    const newAccount: Account & { signals: Signal[]; last_scan?: any } = {
+  const handleAddAccount = async (data: { 
+    name: string
+    domain: string
+    industry?: string
+    employee_count?: string
+    notes?: string 
+  }) => {
+    const newAccount: AccountWithSignals = {
       id: `demo-${Date.now()}`,
       user_id: 'demo',
       ...data,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       signals: [],
+      latestScan: null,
+      signalCount: 0,
+      topScore: 0
     }
-    setAccounts(prev => [...prev, newAccount])
+    setAccounts(prev => [newAccount, ...prev])
     toast.success('Account added', { description: 'Run a scan to find signals' })
   }
 
-  // Get all signals sorted by score
+  // Get all signals sorted by score for top signals section
   const allSignals = accounts
     .flatMap(a => (a.signals || []).map(s => ({ ...s, accountName: a.name })))
     .sort((a, b) => b.score - a.score)
@@ -195,37 +237,39 @@ export function DemoDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader
-        onAddAccount={() => {}}
+        onAddAccount={() => setAddDialogOpen(true)}
+        onScanAll={handleScanAll}
+        isScanning={scanningAccounts.size > 0}
         userEmail="demo@example.com"
         isDemo
       />
       
       <main className="container mx-auto max-w-7xl px-4 py-6">
         {/* Demo Banner */}
-        <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4">
-          <p className="text-sm text-primary">
-            <span className="font-semibold">Demo Mode</span> — Exploring with sample data. 
-            <a href="/auth/sign-up" className="ml-2 underline underline-offset-2 hover:text-primary/80">
-              Create an account
-            </a>
-            {' '}to connect your real book of business.
-          </p>
+        <div className="mb-6 flex flex-col gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+            <div>
+              <p className="font-medium text-foreground">Demo Mode</p>
+              <p className="text-sm text-muted-foreground">
+                Exploring with sample data. Create an account to connect your real book of business.
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm" className="shrink-0">
+            <Link href="/auth/sign-up">Get Started</Link>
+          </Button>
         </div>
 
         <div className="space-y-6">
           <StatsOverview accounts={accounts} />
-
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl italic text-foreground">Your Accounts</h2>
-            <AddAccountDialog onAdd={handleAddAccount} />
-          </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {accounts.map((account) => (
               <AccountCard
                 key={account.id}
                 account={account}
-                onSelect={setSelectedAccount}
+                onSelect={handleSelectAccount}
                 onScan={handleScanAccount}
                 onDelete={handleDeleteAccount}
                 isScanning={scanningAccounts.has(account.id)}
@@ -234,25 +278,34 @@ export function DemoDashboard() {
           </div>
 
           {/* Top Signals Section */}
-          <div className="space-y-4">
-            <h2 className="font-serif text-xl italic text-foreground">Top Signals</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              {allSignals.slice(0, 4).map((signal) => (
-                <SignalCard 
-                  key={signal.id} 
-                  signal={signal} 
-                  showAccount
-                  accountName={signal.accountName}
-                />
-              ))}
+          {allSignals.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="font-serif text-xl italic text-foreground">Top Signals</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                {allSignals.slice(0, 4).map((signal) => (
+                  <SignalCard 
+                    key={signal.id} 
+                    signal={signal} 
+                    showAccount
+                    accountName={signal.accountName}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 
+      <AddAccountDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        onSubmit={handleAddAccount}
+      />
+
       <AccountDetailSheet
         account={selectedAccount}
-        onClose={() => setSelectedAccount(null)}
+        open={detailSheetOpen}
+        onOpenChange={setDetailSheetOpen}
         onScan={handleScanAccount}
         isScanning={selectedAccount ? scanningAccounts.has(selectedAccount.id) : false}
       />

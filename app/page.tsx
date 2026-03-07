@@ -9,6 +9,7 @@ export default async function HomePage() {
   if (user) {
     redirect('/dashboard')
   } else {
-    redirect('/auth/login')
+    // Redirect to demo by default for easy exploration
+    redirect('/demo')
   }
 }

@@ -10,9 +10,11 @@ import { formatDistanceToNow } from 'date-fns'
 
 interface SignalCardProps {
   signal: Signal
+  showAccount?: boolean
+  accountName?: string
 }
 
-export function SignalCard({ signal }: SignalCardProps) {
+export function SignalCard({ signal, showAccount, accountName }: SignalCardProps) {
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'bg-green-500/20 text-green-400 border-green-500/30'
     if (score >= 60) return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
@@ -60,6 +62,11 @@ export function SignalCard({ signal }: SignalCardProps) {
       
       <CardContent className="space-y-3">
         <div>
+          {showAccount && accountName && (
+            <p className="mb-1 text-xs font-medium text-muted-foreground">
+              {accountName}
+            </p>
+          )}
           <h4 className="font-medium leading-tight tracking-tight">
             {signal.title}
           </h4>
