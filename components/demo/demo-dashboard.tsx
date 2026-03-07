@@ -308,13 +308,18 @@ export function DemoDashboard() {
             <div>
               <p className="font-medium text-foreground">Demo Mode</p>
               <p className="text-sm text-muted-foreground">
-                Exploring with sample data. Create an account to connect your real book of business.
+                Exploring with sample data. Create an account to track your real book of business.
               </p>
             </div>
           </div>
-          <Button asChild size="sm" className="shrink-0">
-            <Link href="/auth/sign-up">Get Started</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/auth/login">Sign In</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link href="/auth/sign-up">Create Account</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-6">
