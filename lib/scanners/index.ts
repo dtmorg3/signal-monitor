@@ -1,7 +1,10 @@
 import { scanHackerNews, type DetectedSignal } from './hacker-news'
 import { scanGitHub } from './github'
-import { scanWebSearch } from './web-search'
 import { scanJobBoards } from './job-boards'
+import { scanTechCrunch } from './techcrunch'
+import { scanGoogleNews } from './google-news'
+import { scanPRNewswire } from './pr-newswire'
+import { scanCompanyBlog } from './company-blog'
 
 export type { DetectedSignal }
 
@@ -23,8 +26,11 @@ export async function runFullScan(
   const scanners = [
     { name: 'Hacker News', fn: () => scanHackerNews(companyName, domain) },
     { name: 'GitHub', fn: () => scanGitHub(companyName, domain) },
-    { name: 'Web Search', fn: () => scanWebSearch(companyName, domain) },
     { name: 'Job Boards', fn: () => scanJobBoards(companyName, domain) },
+    { name: 'TechCrunch', fn: () => scanTechCrunch(companyName, domain) },
+    { name: 'Google News', fn: () => scanGoogleNews(companyName, domain) },
+    { name: 'PR Newswire', fn: () => scanPRNewswire(companyName, domain) },
+    { name: 'Company Blog', fn: () => scanCompanyBlog(companyName, domain) },
   ]
 
   const results = await Promise.allSettled(

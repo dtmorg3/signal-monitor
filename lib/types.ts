@@ -5,6 +5,10 @@ export type SignalSource =
   | 'lever' 
   | 'crunchbase' 
   | 'github'
+  | 'techcrunch'
+  | 'google_news'
+  | 'pr_newswire'
+  | 'company_blog'
 
 export type SignalType = 
   | 'hiring' 
@@ -94,7 +98,11 @@ export const SIGNAL_SOURCE_LABELS: Record<SignalSource, string> = {
   greenhouse: 'Greenhouse',
   lever: 'Lever',
   crunchbase: 'Crunchbase',
-  github: 'GitHub'
+  github: 'GitHub',
+  techcrunch: 'TechCrunch',
+  google_news: 'Google News',
+  pr_newswire: 'PR Newswire',
+  company_blog: 'Company Blog'
 }
 
 export const SIGNAL_TYPE_COLORS: Record<SignalType, string> = {
