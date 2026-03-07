@@ -41,8 +41,13 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Allow demo route without auth
+  if (request.nextUrl.pathname.startsWith('/demo')) {
+    return supabaseResponse
+  }
+
   // Protected routes - require authentication
-  const protectedPaths = ['/dashboard', '/protected']
+  const protectedPaths = ['/dashboard', '/protected', '/onboarding', '/roadmap']
   const isProtectedPath = protectedPaths.some(path => 
     request.nextUrl.pathname.startsWith(path)
   )

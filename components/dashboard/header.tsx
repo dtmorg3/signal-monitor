@@ -8,17 +8,22 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 interface HeaderProps {
-  onAddAccount: () => void
-  onScanAll: () => void
-  isScanning: boolean
+  onAddAccount?: () => void
+  onScanAll?: () => void
+  isScanning?: boolean
   userEmail?: string
+  isDemo?: boolean
 }
 
-export function Header({ onAddAccount, onScanAll, isScanning, userEmail }: HeaderProps) {
+export function DashboardHeader({ onAddAccount, onScanAll, isScanning, userEmail, isDemo }: HeaderProps) {
   const router = useRouter()
   const supabase = createClient()
 
   const handleLogout = async () => {
+    if (isDemo) {
+      router.push('/auth/login')
+      return
+    }
     await supabase.auth.signOut()
     toast.success('Logged out successfully')
     router.push('/auth/login')
