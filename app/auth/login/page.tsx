@@ -94,6 +94,19 @@ export default function LoginPage() {
                 'Sign in'
               )}
             </Button>
+            <div className="relative w-full">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">or</span>
+              </div>
+            </div>
+            <Button variant="outline" className="w-full" asChild>
+              <Link href="/demo">
+                Try Demo Mode
+              </Link>
+            </Button>
             <p className="text-center text-sm text-muted-foreground">
               {"Don't have an account? "}
               <Link href="/auth/sign-up" className="text-primary hover:underline">
