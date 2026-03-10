@@ -341,7 +341,7 @@ export function DemoDashboard() {
           {/* Top Signals Section */}
           {allSignals.length > 0 && (
             <div className="space-y-4">
-              <h2 className="font-serif text-xl italic text-foreground">Top Signals</h2>
+              <h2 className="text-xl font-semibold text-foreground">Top Signals</h2>
               <div className="grid gap-4 md:grid-cols-2">
                 {allSignals.slice(0, 4).map((signal) => (
                   <SignalCard 

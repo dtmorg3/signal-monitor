@@ -1,23 +1,23 @@
 import type { Metadata, Viewport } from 'next'
-import { JetBrains_Mono, Instrument_Serif } from 'next/font/google'
+import { Inter, Source_Code_Pro } from 'next/font/google'
+import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _jetbrainsMono = JetBrains_Mono({ 
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: '--font-sans'
+});
+
+const sourceCodePro = Source_Code_Pro({ 
   subsets: ["latin"],
   variable: '--font-mono'
 });
 
-const _instrumentSerif = Instrument_Serif({ 
-  subsets: ["latin"],
-  weight: "400",
-  variable: '--font-serif'
-});
-
 export const metadata: Metadata = {
-  title: 'Signal Monitor | Expansion Intelligence',
-  description: 'Surface actionable expansion signals from your book of business using public data sources',
+  title: 'Signal Monitor | Research Intelligence',
+  description: 'Surface actionable signals from companies using public data sources - for sales teams and job seekers',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -42,7 +42,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#0a0a0a',
+  themeColor: '#ffffff',
 }
 
 export default function RootLayout({
@@ -51,10 +51,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark bg-background">
-      <body className="font-mono antialiased">
-        {children}
-        <Toaster />
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${sourceCodePro.variable} font-sans antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

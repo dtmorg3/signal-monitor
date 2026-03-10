@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Plus, Radar, LogOut, Map } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -77,6 +78,7 @@ export function DashboardHeader({ onAddAccount, onScanAll, isScanning, userEmail
             <Plus className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Add Account</span>
           </Button>
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="sm"
