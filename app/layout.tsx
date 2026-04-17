@@ -16,7 +16,7 @@ const sourceCodePro = Source_Code_Pro({
 });
 
 export const metadata: Metadata = {
-  title: 'Signal Monitor | Research Intelligence',
+  title: 'Echolok8 | Research Intelligence',
   description: 'Surface actionable signals from companies using public data sources - for sales teams and job seekers',
   generator: 'v0.app',
   icons: {

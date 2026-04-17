@@ -57,7 +57,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
           <CardDescription>
-            Sign in to your Signal Monitor account
+            Sign in to your Echolok8 account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>

@@ -38,8 +38,8 @@ export function DashboardHeader({ onAddAccount, onScanAll, isScanning, userEmail
             <Radar className="h-4 w-4 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-sm font-medium tracking-tight">Signal Monitor</h1>
-            <p className="text-xs text-muted-foreground">Expansion Intelligence</p>
+            <h1 className="text-sm font-medium tracking-tight">Echolok8</h1>
+            <p className="text-xs text-muted-foreground">Research Intelligence</p>
           </div>
         </div>
         

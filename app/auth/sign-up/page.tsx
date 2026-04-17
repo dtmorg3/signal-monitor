@@ -72,7 +72,7 @@ export default function SignUpPage() {
           </div>
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription>
-            Start monitoring expansion signals for your accounts
+            Start researching companies with Echolok8
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSignUp}>
