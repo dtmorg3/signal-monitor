@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import type { Account, Signal, Scan, AccountWithSignals } from '@/lib/types'
 import { DashboardHeader } from './header'
 import { AccountCard } from './account-card'
+import { AccountListRow } from './account-list-row'
+import { ViewControls, type ViewMode, type SortOption } from './view-controls'
 import { AddAccountDialog } from './add-account-dialog'
 import { AccountDetailSheet } from './account-detail-sheet'
 import { EmptyState } from './empty-state'
@@ -73,6 +75,8 @@ export function Dashboard({ userId, userEmail }: DashboardProps) {
   const [detailSheetOpen, setDetailSheetOpen] = useState(false)
   const [scanningAccounts, setScanningAccounts] = useState<Set<string>>(new Set())
   const [isScanningSingle, setIsScanningSingle] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [sortBy, setSortBy] = useState<SortOption>('score')
 
   const { data: accounts, error, isLoading, mutate } = useSWR(
     ['accounts', userId],
@@ -192,6 +196,24 @@ export function Dashboard({ userId, userEmail }: DashboardProps) {
     setDetailSheetOpen(true)
   }, [])
 
+  // Sort accounts based on selected option
+  const sortedAccounts = accounts ? [...accounts].sort((a, b) => {
+    switch (sortBy) {
+      case 'score':
+        return b.topScore - a.topScore
+      case 'signals':
+        return b.signalCount - a.signalCount
+      case 'recent':
+        const aTime = a.latestScan ? new Date(a.latestScan.started_at).getTime() : 0
+        const bTime = b.latestScan ? new Date(b.latestScan.started_at).getTime() : 0
+        return bTime - aTime
+      case 'name':
+        return a.name.localeCompare(b.name)
+      default:
+        return 0
+    }
+  }) : []
+
   if (error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
@@ -219,18 +241,42 @@ export function Dashboard({ userId, userEmail }: DashboardProps) {
         ) : accounts && accounts.length > 0 ? (
           <div className="space-y-6">
             <StatsOverview accounts={accounts} />
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {accounts.map((account) => (
-                <AccountCard
-                  key={account.id}
-                  account={account}
-                  onSelect={handleSelectAccount}
-                  onScan={handleScanAccount}
-                  onDelete={handleDeleteAccount}
-                  isScanning={scanningAccounts.has(account.id)}
-                />
-              ))}
-            </div>
+            
+            <ViewControls
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              accountCount={accounts.length}
+            />
+
+            {viewMode === 'grid' ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {sortedAccounts.map((account) => (
+                  <AccountCard
+                    key={account.id}
+                    account={account}
+                    onSelect={handleSelectAccount}
+                    onScan={handleScanAccount}
+                    onDelete={handleDeleteAccount}
+                    isScanning={scanningAccounts.has(account.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {sortedAccounts.map((account) => (
+                  <AccountListRow
+                    key={account.id}
+                    account={account}
+                    onSelect={handleSelectAccount}
+                    onScan={handleScanAccount}
+                    onDelete={handleDeleteAccount}
+                    isScanning={scanningAccounts.has(account.id)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <EmptyState onAddAccount={() => setAddDialogOpen(true)} />

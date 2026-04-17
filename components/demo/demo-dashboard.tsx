@@ -5,6 +5,8 @@ import Link from 'next/link'
 import type { AccountWithSignals, Signal } from '@/lib/types'
 import { DashboardHeader } from '../dashboard/header'
 import { AccountCard } from '../dashboard/account-card'
+import { AccountListRow } from '../dashboard/account-list-row'
+import { ViewControls, type ViewMode, type SortOption } from '../dashboard/view-controls'
 import { SignalCard } from '../dashboard/signal-card'
 import { StatsOverview } from '../dashboard/stats-overview'
 import { AccountDetailSheet } from '../dashboard/account-detail-sheet'
@@ -221,6 +223,8 @@ export function DemoDashboard() {
   const [detailSheetOpen, setDetailSheetOpen] = useState(false)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [scanningAccounts, setScanningAccounts] = useState<Set<string>>(new Set())
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [sortBy, setSortBy] = useState<SortOption>('score')
 
   const handleSelectAccount = (account: AccountWithSignals) => {
     setSelectedAccount(account)
@@ -285,6 +289,24 @@ export function DemoDashboard() {
     toast.success('Account added', { description: 'Run a scan to find signals' })
   }
 
+  // Sort accounts based on selected option
+  const sortedAccounts = [...accounts].sort((a, b) => {
+    switch (sortBy) {
+      case 'score':
+        return b.topScore - a.topScore
+      case 'signals':
+        return b.signalCount - a.signalCount
+      case 'recent':
+        const aTime = a.latestScan ? new Date(a.latestScan.started_at).getTime() : 0
+        const bTime = b.latestScan ? new Date(b.latestScan.started_at).getTime() : 0
+        return bTime - aTime
+      case 'name':
+        return a.name.localeCompare(b.name)
+      default:
+        return 0
+    }
+  })
+
   // Get all signals sorted by score for top signals section
   const allSignals = accounts
     .flatMap(a => (a.signals || []).map(s => ({ ...s, accountName: a.name })))
@@ -325,18 +347,41 @@ export function DemoDashboard() {
         <div className="space-y-6">
           <StatsOverview accounts={accounts} />
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {accounts.map((account) => (
-              <AccountCard
-                key={account.id}
-                account={account}
-                onSelect={handleSelectAccount}
-                onScan={handleScanAccount}
-                onDelete={handleDeleteAccount}
-                isScanning={scanningAccounts.has(account.id)}
-              />
-            ))}
-          </div>
+          <ViewControls
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            accountCount={accounts.length}
+          />
+
+          {viewMode === 'grid' ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {sortedAccounts.map((account) => (
+                <AccountCard
+                  key={account.id}
+                  account={account}
+                  onSelect={handleSelectAccount}
+                  onScan={handleScanAccount}
+                  onDelete={handleDeleteAccount}
+                  isScanning={scanningAccounts.has(account.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {sortedAccounts.map((account) => (
+                <AccountListRow
+                  key={account.id}
+                  account={account}
+                  onSelect={handleSelectAccount}
+                  onScan={handleScanAccount}
+                  onDelete={handleDeleteAccount}
+                  isScanning={scanningAccounts.has(account.id)}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Top Signals Section */}
           {allSignals.length > 0 && (
