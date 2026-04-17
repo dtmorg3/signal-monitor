@@ -15,7 +15,8 @@ import {
   MoreVertical, 
   Radar, 
   Trash2,
-  TrendingUp
+  TrendingUp,
+  Flame
 } from 'lucide-react'
 import type { AccountWithSignals, Signal } from '@/lib/types'
 import { SIGNAL_TYPE_LABELS } from '@/lib/types'
@@ -40,12 +41,15 @@ export function AccountCard({
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-400'
-    if (score >= 60) return 'text-yellow-400'
-    if (score >= 40) return 'text-orange-400'
-    return 'text-muted-foreground'
+  const getScoreStyles = (score: number) => {
+    if (score >= 90) return { color: 'text-green-600 dark:text-green-400', isHot: true, label: 'Reach out!' }
+    if (score >= 75) return { color: 'text-green-600 dark:text-green-400', isHot: false, label: 'Strong signal' }
+    if (score >= 60) return { color: 'text-yellow-600 dark:text-yellow-400', isHot: false, label: 'Worth watching' }
+    if (score >= 40) return { color: 'text-orange-600 dark:text-orange-400', isHot: false, label: 'Low priority' }
+    return { color: 'text-muted-foreground', isHot: false, label: 'Weak signal' }
   }
+
+  const scoreStyles = getScoreStyles(account.topScore)
 
   return (
     <Card 
@@ -113,11 +117,17 @@ export function AccountCard({
         {/* Score indicator */}
         {account.topScore > 0 && (
           <div className="flex items-center gap-2">
-            <TrendingUp className={`h-4 w-4 ${getScoreColor(account.topScore)}`} />
-            <span className={`text-sm font-medium ${getScoreColor(account.topScore)}`}>
+            {scoreStyles.isHot ? (
+              <Flame className="h-4 w-4 text-orange-500 animate-pulse" />
+            ) : (
+              <TrendingUp className={`h-4 w-4 ${scoreStyles.color}`} />
+            )}
+            <span className={`text-sm font-bold ${scoreStyles.color}`}>
               {account.topScore}
             </span>
-            <span className="text-xs text-muted-foreground">top signal score</span>
+            <span className={`text-xs ${scoreStyles.isHot ? scoreStyles.color + ' font-medium' : 'text-muted-foreground'}`}>
+              {scoreStyles.label}
+            </span>
           </div>
         )}
 

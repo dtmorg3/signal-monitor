@@ -14,7 +14,8 @@ import {
   MoreVertical, 
   Radar, 
   Trash2,
-  ChevronRight
+  ChevronRight,
+  Flame
 } from 'lucide-react'
 import type { AccountWithSignals } from '@/lib/types'
 import { SIGNAL_TYPE_LABELS } from '@/lib/types'
@@ -43,15 +44,30 @@ export function AccountListRow({
     return 'outline'
   }
 
+  const getScoreStyles = (score: number) => {
+    if (score >= 90) return { bg: 'bg-green-500/20', text: 'text-green-600 dark:text-green-400', isHot: true }
+    if (score >= 75) return { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', isHot: false }
+    if (score >= 60) return { bg: 'bg-yellow-500/10', text: 'text-yellow-600 dark:text-yellow-400', isHot: false }
+    if (score >= 40) return { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', isHot: false }
+    return { bg: 'bg-muted', text: 'text-muted-foreground', isHot: false }
+  }
+
+  const scoreStyles = getScoreStyles(account.topScore)
+
   return (
     <div 
       className="group flex cursor-pointer items-center gap-4 rounded-lg border bg-card p-4 transition-colors hover:bg-accent/50"
       onClick={() => onSelect(account)}
     >
       {/* Score badge */}
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted">
+      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${scoreStyles.bg}`}>
         {account.topScore > 0 ? (
-          <span className="text-lg font-semibold">{account.topScore}</span>
+          <div className="flex flex-col items-center">
+            {scoreStyles.isHot && (
+              <Flame className="h-3 w-3 text-orange-500 animate-pulse" />
+            )}
+            <span className={`text-lg font-bold ${scoreStyles.text}`}>{account.topScore}</span>
+          </div>
         ) : (
           <Building2 className="h-5 w-5 text-muted-foreground" />
         )}
