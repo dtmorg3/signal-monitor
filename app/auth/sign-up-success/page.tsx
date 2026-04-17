@@ -18,7 +18,7 @@ export default function SignUpSuccessPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Click the link in the email to verify your account and start using Signal Monitor.
+            Click the link in the email to verify your account and start using Echolok8.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">

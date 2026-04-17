@@ -1,8 +1,8 @@
-# Signal Monitor - Technical Design Document
+# Echolok8 - Technical Design Document
 
 ## What Is This?
 
-Signal Monitor is a research intelligence tool that surfaces actionable signals from companies using public data sources. Originally designed for sales AEs to monitor their book of business, it's equally useful for **job seekers** researching prospective employers.
+Echolok8 is a research intelligence tool that surfaces actionable signals from companies using public data sources. Originally designed for sales AEs to monitor their book of business, it's equally useful for **job seekers** researching prospective employers.
 
 **Core Value Prop:** Instead of manually checking HN, TechCrunch, LinkedIn, job boards, etc. for company news, the app aggregates signals in one place with AI-generated "play recommendations" for outreach timing.
 

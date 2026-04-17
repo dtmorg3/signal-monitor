@@ -13,8 +13,8 @@ export function EmptyState({ onAddAccount }: EmptyStateProps) {
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
         <Radar className="h-8 w-8 text-primary" />
       </div>
-      <h2 className="mt-6 font-serif text-2xl tracking-tight">
-        Welcome to Signal Monitor
+      <h2 className="mt-6 text-2xl font-semibold tracking-tight">
+        Welcome to Echolok8
       </h2>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
         Add accounts from your book of business to discover expansion signals 

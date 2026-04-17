@@ -140,8 +140,8 @@ export function OnboardingWizard({ userId, onComplete }: OnboardingWizardProps) 
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-primary">
             <Radar className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="font-serif text-2xl tracking-tight">Signal Monitor</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Expansion Intelligence for AEs</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Echolok8</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Research Intelligence</p>
         </div>
 
         <Progress value={progressPercentage} className="mb-6" />
@@ -311,7 +311,7 @@ export function OnboardingWizard({ userId, onComplete }: OnboardingWizardProps) 
                 {"You're all set!"}
               </CardTitle>
               <CardDescription>
-                Your Signal Monitor is ready. Start discovering expansion opportunities.
+                Echolok8 is ready. Start discovering opportunities.
               </CardDescription>
             </CardHeader>
             <CardContent>
